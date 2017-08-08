@@ -3,7 +3,7 @@ import numpy as np
 from pandas import DataFrame
 
 df = pd.read_csv('hussein.csv', encoding = "ISO-8859-1", index_col='framecounter')
-testdf = pd.read_csv('husseincompare.csv', encoding = "ISO-8859-1", index_col='framecounter')
+veriteT = pd.read_csv('husseincompare.csv', encoding = "ISO-8859-1", index_col='framecounter')
 
 #df2 = df.loc[:,('filename', 'track', 'start', 'end', 'duration', 'Value Right eye')]
 #testdf2 = testdf.loc[:,('filename', 'track', 'start', 'end', 'duration', 'Value Left eye')]
@@ -19,14 +19,28 @@ testdf = pd.read_csv('husseincompare.csv', encoding = "ISO-8859-1", index_col='f
 #print(testdf3)
 
 print(df.head())
-print(testdf)
+print(veriteT)
 
-testdf['check1'] = np.where((testdf['Value Right eye'] == testdf['Value Left eye']), 'precise', 'not precise')
+df['precision'] = np.where((df['Value Right eye'] == df['Value Left eye']), '1', '0') #1 means the reading is precise ie. both values are identical
+print(df)
+zeros = [(df[df.precision == '0'].shape[0])]
+ones = [(df[df.precision == '1'].shape[0])]
+print('nombre de valeurs incohérentes: ' + str(zeros))
+print('nombre de valeurs cohérentes: ' + str(ones))
 
-print(testdf)
+entries = len(df.index)
 
-#if df['Value Right eye'] == 'center, center':
- #   df['right #'] = '1'
+resultdf = pd.DataFrame({'Inconsistent':zeros, 'Consistent':ones, 'EntryNum':entries}, dtype=int)
+precision = (resultdf.Consistent / resultdf.EntryNum) * 100
+roundedprec = round(precision, 2)
+print(resultdf)
+print('Taux de détection  valid (%): ' + str(roundedprec))
+
+#df['right #'] = np.where(df['Value Right eye'].str.contains('center, center'), '1')
+
+#comparaison des valeurs à la verité terrain
+if df['Value Right eye'].values.any() == 'center, center':
+    df['right #'] = '1'
 #elif df['Value Right eye'] == 'left, center':
  #   df['right #'] = '2'
 #elif df['Value Right eye'] == 'left, Up':
@@ -38,3 +52,4 @@ print(testdf)
 #else:
  #   df['right #'] = '6'
 
+print(df)
