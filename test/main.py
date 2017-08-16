@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 from pandas import DataFrame
+import matplotlib.pyplot as plt
+from matplotlib import style
+
+style.use('ggplot')
 
 df = pd.read_csv('hussein.csv', encoding = "ISO-8859-1", index_col='framecounter')
 veriteT = pd.read_csv('husseincompare.csv', encoding = "ISO-8859-1", index_col='framecounter')
@@ -36,6 +40,18 @@ roundedprec = round(precision, 2)
 print(resultdf)
 print('Taux de détection  valid (%): ' + str(roundedprec))
 
+#graphiques a barres qui visualise le nombre de resultats valid vs non valid
+N = 3
+width = 0.05
+ind = np.arange(N)
+fig, ax = plt.subplots()
+plt.bar(ind,[resultdf.EntryNum,resultdf.Inconsistent,resultdf.Consistent])
+plt.title('Nombre de resultats valid vs non-valid \nComparé au nombre totale de valeur')
+plt.ylabel('Nombre de valeur')
+ax.set_xticks(ind + width / 2)
+ax.set_xticklabels(('total', 'non-valid', 'valid'))
+plt.show()
+
 #df['right #'] = np.where(df['Value Right eye'].str.contains('center, center'), '1')
 
 #comparaison des valeurs à la verité terrain
@@ -52,4 +68,3 @@ if df['Value Right eye'].values.any() == 'center, center':
 #else:
  #   df['right #'] = '6'
 
-print(df)
