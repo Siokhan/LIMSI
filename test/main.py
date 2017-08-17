@@ -50,21 +50,21 @@ plt.title('Nombre de resultats valid vs non-valid \nComparé au nombre totale de
 plt.ylabel('Nombre de valeur')
 ax.set_xticks(ind + width / 2)
 ax.set_xticklabels(('total', 'non-valid', 'valid'))
-plt.show()
+#plt.show()
 
-#df['right #'] = np.where(df['Value Right eye'].str.contains('center, center'), '1')
+df['Gaze #'] = 0
+
+conditions = [
+        (df['Value Left eye'] == 'center, center') & (df['Value Right eye'] == 'center, center'),
+        (df['Value Left eye'] == 'left, center') & (df['Value Right eye'] == 'left, center'),
+        (df['Value Left eye'] == 'left, Up') & (df['Value Right eye'] == 'left, Up'),
+        (df['Value Left eye'] == 'center, Up') & (df['Value Right eye'] == 'center, Up'),
+        (df['Value Left eye'] == 'right, Up') & (df['Value Right eye'] == 'right, Up'),
+        (df['Value Left eye'] == 'right, center') & (df['Value Right eye'] == 'right, center')]
+choices = [1, 2, 3, 4, 5, 6]
+
+df['Gaze #'] = np.select(conditions, choices, default = 0)
+
+print(df)
 
 #comparaison des valeurs à la verité terrain
-if df['Value Right eye'].values.any() == 'center, center':
-    df['right #'] = '1'
-#elif df['Value Right eye'] == 'left, center':
- #   df['right #'] = '2'
-#elif df['Value Right eye'] == 'left, Up':
- #   df['right #'] = '3'
-#elif df['Value Right eye'] == 'center, Up':
- #   df['right #'] = '4'
-#elif df['Value Right eye'] == 'right, Up':
- #   df['right #'] = '5'
-#else:
- #   df['right #'] = '6'
-
