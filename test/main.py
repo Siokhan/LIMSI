@@ -11,19 +11,12 @@ veriteT = pd.read_csv('husseincompare.csv', encoding = "ISO-8859-1", index_col='
 
 #df2 = df.loc[:,('filename', 'track', 'start', 'end', 'duration', 'Value Right eye')]
 #testdf2 = testdf.loc[:,('filename', 'track', 'start', 'end', 'duration', 'Value Left eye')]
-
 #df3 = df2.loc[(df2['track'] == "Gaze")]
 #testdf3 = testdf2.loc[(testdf2['track'] == "Gaze")]
-
-#print(df3.head())
-#print(testdf3) 
-
 #testdf3['check'] = np.where(testdf3['Value'] == df3['Value'], 'valid', 'invalid')
 
-#print(testdf3)
-
 print(df.head())
-print(veriteT)
+print(veriteT.head())
 
 df['precision'] = np.where((df['Value Right eye'] == df['Value Left eye']), '1', '0') #1 means the reading is precise ie. both values are identical
 print(df)
@@ -40,6 +33,36 @@ roundedprec = round(precision, 2)
 print(resultdf)
 print('Taux de détection  valid (%): ' + str(roundedprec))
 
+df['Gaze#'] = 0
+
+#assigne une valeur unique si Value Left et Right eye sont identique, facilitie comparaison a la verité terrain
+conditions = [
+        (df['Value Left eye'] == 'center, center') & (df['Value Right eye'] == 'center, center'),
+        (df['Value Left eye'] == 'left, center') & (df['Value Right eye'] == 'left, center'),
+        (df['Value Left eye'] == 'left, Up') & (df['Value Right eye'] == 'left, Up'),
+        (df['Value Left eye'] == 'center, Up') & (df['Value Right eye'] == 'center, Up'),
+        (df['Value Left eye'] == 'right, Up') & (df['Value Right eye'] == 'right, Up'),
+        (df['Value Left eye'] == 'right, center') & (df['Value Right eye'] == 'right, center')]
+choices = [1, 2, 3, 4, 5, 6]
+
+conditions2 = [
+        (veriteT['Value Left eye'] == 'center, center') & (veriteT['Value Right eye'] == 'center, center'),
+        (veriteT['Value Left eye'] == 'left, center') & (veriteT['Value Right eye'] == 'left, center'),
+        (veriteT['Value Left eye'] == 'left, Up') & (veriteT['Value Right eye'] == 'left, Up'),
+        (veriteT['Value Left eye'] == 'center, Up') & (veriteT['Value Right eye'] == 'center, Up'),
+        (veriteT['Value Left eye'] == 'right, Up') & (veriteT['Value Right eye'] == 'right, Up'),
+        (veriteT['Value Left eye'] == 'right, center') & (veriteT['Value Right eye'] == 'right, center')]
+choices2 = [1, 2, 3, 4, 5, 6]
+
+veriteT['Gaze#'] = np.select(conditions2, choices2, default = 0)
+df['Gaze#'] = np.select(conditions, choices, default = 0)
+
+print(veriteT)
+
+#comparaison des valeurs à la verité terrain
+df['CmpVerité'] = np.where(df['Gaze#'] == veriteT['Gaze#'], 'correcte', 'incorrecte')
+print(df)
+
 #graphiques a barres qui visualise le nombre de resultats valid vs non valid
 N = 3
 width = 0.05
@@ -50,21 +73,10 @@ plt.title('Nombre de resultats valid vs non-valid \nComparé au nombre totale de
 plt.ylabel('Nombre de valeur')
 ax.set_xticks(ind + width / 2)
 ax.set_xticklabels(('total', 'non-valid', 'valid'))
-#plt.show()
 
-df['Gaze #'] = 0
+M = entries
+ind2 = np.arange(M)
+df.plot(ind2, y='Gaze#')
+plt.title('Frequence de valeurs valides')
+plt.show()
 
-conditions = [
-        (df['Value Left eye'] == 'center, center') & (df['Value Right eye'] == 'center, center'),
-        (df['Value Left eye'] == 'left, center') & (df['Value Right eye'] == 'left, center'),
-        (df['Value Left eye'] == 'left, Up') & (df['Value Right eye'] == 'left, Up'),
-        (df['Value Left eye'] == 'center, Up') & (df['Value Right eye'] == 'center, Up'),
-        (df['Value Left eye'] == 'right, Up') & (df['Value Right eye'] == 'right, Up'),
-        (df['Value Left eye'] == 'right, center') & (df['Value Right eye'] == 'right, center')]
-choices = [1, 2, 3, 4, 5, 6]
-
-df['Gaze #'] = np.select(conditions, choices, default = 0)
-
-print(df)
-
-#comparaison des valeurs à la verité terrain
