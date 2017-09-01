@@ -8,6 +8,8 @@ style.use('ggplot')
 
 df = pd.read_csv('hussein.csv', encoding = "ISO-8859-1", index_col='framecounter')
 veriteT = pd.read_csv('husseincompare.csv', encoding = "ISO-8859-1", index_col='framecounter')
+symetryDf = pd.read_csv('symetry.csv', encoding = "ISO-8859-1", index_col='framecounter')
+symetryDf.dropna(axis=0, how='any')
 
 #df2 = df.loc[:,('filename', 'track', 'start', 'end', 'duration', 'Value Right eye')]
 #testdf2 = testdf.loc[:,('filename', 'track', 'start', 'end', 'duration', 'Value Left eye')]
@@ -60,7 +62,7 @@ df['Gaze#'] = np.select(conditions, choices, default = 0)
 print(veriteT)
 
 #comparaison des valeurs à la verité terrain
-df['CmpVerité'] = np.where(df['Gaze#'] == veriteT['Gaze#'], 'correcte', 'incorrecte')
+df['CmpVeriteT'] = np.where(df['Gaze#'] == veriteT['Gaze#'], 'correcte', 'incorrecte')
 print(df)
 
 #graphiques a barres qui visualise le nombre de resultats valid vs non valid
@@ -76,7 +78,11 @@ ax.set_xticklabels(('total', 'non-valid', 'valid'))
 
 M = entries
 ind2 = np.arange(M)
-df.plot(ind2, y='Gaze#')
+ind3 = ind2 + 1
+df.plot(x=ind2, y='Gaze#')
 plt.title('Frequence de valeurs valides')
 plt.show()
 
+#print(symetryDf)
+
+df.to_csv('results.csv')
